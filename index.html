@@ -82,7 +82,7 @@ button:focus-visible,.file-btn:focus-within{outline:2px solid var(--accent);outl
 </div>
 
 <div class="dock">
-  <div class="group" id="owner-tools">
+  <div class="group" id="owner-tools" hidden>
     <label class="file-btn" for="file">Open model
       <input id="file" type="file" multiple accept=".fbx,.glb,.gltf,.bin,.png,.jpg,.jpeg,.webp,.tga">
     </label>
@@ -393,10 +393,12 @@ document.getElementById('file').addEventListener('change', e=>{ if(e.target.file
 
 const drop = document.getElementById('drop');
 let dragDepth = 0;
-addEventListener('dragenter', e=>{ e.preventDefault(); dragDepth++; drop.hidden = false; });
+const PREVIEW = new URLSearchParams(location.search).has('preview');   // Joy's own preview page: ?preview
+if(PREVIEW) document.getElementById('owner-tools').hidden = false;
+addEventListener('dragenter', e=>{ e.preventDefault(); if(!PREVIEW) return; dragDepth++; drop.hidden = false; });
 addEventListener('dragleave', ()=>{ dragDepth--; if(dragDepth<=0){ drop.hidden = true; dragDepth=0; } });
 addEventListener('dragover', e=>e.preventDefault());
-addEventListener('drop', e=>{ e.preventDefault(); dragDepth=0; drop.hidden = true; if(e.dataTransfer.files.length) loadFiles(e.dataTransfer.files); });
+addEventListener('drop', e=>{ e.preventDefault(); if(!PREVIEW) return; dragDepth=0; drop.hidden = true; if(e.dataTransfer.files.length) loadFiles(e.dataTransfer.files); });
 
 // ---------- UI ----------
 const bgBtns = document.querySelectorAll('[data-bg]');
@@ -496,7 +498,7 @@ addEventListener('resize', resize);
 resize();
 
 if(slug) openHosted(slug);
-else await setModel(demoScene(), 'Sample scene', 'Open an FBX or GLB to preview it');
+else await setModel(demoScene(), 'Sample scene', PREVIEW ? 'Open an FBX or GLB to check it before uploading' : 'Drag to rotate · pinch to zoom');
 
 renderer.setAnimationLoop(()=>{
   controls.update();

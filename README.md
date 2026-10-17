@@ -33,4 +33,5 @@ Folder names: letters, numbers, `-` and `_` only. No spaces.
 
 - This repo is public (GitHub Pages on a free account needs that), so anyone with a link can view the model files. Don't put confidential client work here.
 - GitHub warns at 50 MB and blocks files over 100 MB. Keep models small (under ~20 MB loads well on phones).
-- Opening the site without `?m=` shows a sample scene and lets you preview any FBX/GLB locally. Nothing is uploaded from that preview.
+- Opening the site without `?m=` shows a sample scene, view only.
+- Your own check page is `?preview`: it adds **Open model** so you can test an FBX/GLB on your device before uploading it. Nothing is uploaded from it, and it isn't linked anywhere. Only GitHub (signed in as you) can add or change models.

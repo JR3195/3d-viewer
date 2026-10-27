@@ -107,7 +107,7 @@ button:focus-visible,.file-btn:focus-within{outline:2px solid var(--accent);outl
   <div class="tm-bar"><b>Twinmotion</b>
     <span class="tm-actions"><a id="tm-new" href="#" target="_blank" rel="noopener">Open in new tab</a><button id="tm-close">Close</button></span>
   </div>
-  <iframe id="tm-frame" title="Twinmotion presentation" allow="fullscreen; autoplay; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="tm-frame" title="Twinmotion presentation" allow="fullscreen; autoplay"></iframe>
 </div>
 
 <div id="drop" hidden>Drop FBX / GLB here</div>
@@ -140,7 +140,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1 : 1.25));
 renderer.toneMapping = THREE.NeutralToneMapping;   // keeps base colours and printed graphics true, no wash-out
 renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 400);
@@ -410,7 +410,9 @@ function setBg(name, rebuild=true){
   const target = new THREE.Color(p.floor);
   const kc = key.position.clone().normalize().y * key.intensity / Math.PI;   // key light's share on the floor
   const L = scene.environment.userData.floorLight.map(v=>v + kc);
-  floorMat.color.setRGB(Math.min(1, target.r/L[0]), Math.min(1, target.g/L[1]), Math.min(1, target.b/L[2]));
+  // Neutral tone mapping darkens deep shadows (its toe), so aim the lit floor at the value that maps back to the background
+  const pre = v=>(v < 0.04 ? Math.sqrt(v / 6.25) : v + 0.04) / renderer.toneMappingExposure;
+  floorMat.color.setRGB(Math.min(1, pre(target.r)/L[0]), Math.min(1, pre(target.g)/L[1]), Math.min(1, pre(target.b)/L[2]));
   stage.style.background = p.css;
   bgBtns.forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.bg === name)));
   currentBg = name;
